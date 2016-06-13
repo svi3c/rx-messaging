@@ -1,0 +1,54 @@
+{
+  "name": "rx-messaging",
+  "version": "0.0.1",
+  "description": "A channeled messaging protocol implementation on top of TCP/TLS server and socket to enable rxjs messaging",
+  "main": "dist/messaging.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "prepublish": "npm run test && tsc",
+    "check": "tslint \"src/**/*.ts\"",
+    "test": "npm run check && npm run stest && npm run mtest",
+    "stest": "jasmine-ts \"src/**/*.s-spec.ts\"",
+    "mtest": "jasmine-ts \"src/**/*.m-spec.ts\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/svi3c/rx-messaging.git"
+  },
+  "keywords": [
+    "rx",
+    "rxjs",
+    "messaging",
+    "net",
+    "network",
+    "tcp",
+    "tls",
+    "node",
+    "typescript"
+  ],
+  "author": "Sven Reglitzki <sreglitzki@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/svi3c/rx-messaging/issues"
+  },
+  "homepage": "https://github.com/svi3c/rx-messaging#readme",
+  "dependencies": {
+    "es6-shim": "^0.35.0",
+    "json-socket": "^0.1.2",
+    "rxjs": "^5.0.0-beta.6"
+  },
+  "devDependencies": {
+    "jasmine-await": "0.0.2",
+    "jasmine-spec-reporter": "^2.4.0",
+    "jasmine-ts": "0.0.2",
+    "proxyquire": "^1.7.4",
+    "tslint": "^3.6.0",
+    "typescript": "^1.8.10",
+    "typings": "^1.0.4"
+  },
+  "engines": {
+    "node": ">=4.0.0"
+  }
+}

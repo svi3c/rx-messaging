@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es2015",
+    "declaration": true,
+    "removeComments": true,
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "outDir": "lib"
+  },
+  "files": [
+    "typings/index.d.ts",
+    "src/messaging.ts"
+  ]
+}
