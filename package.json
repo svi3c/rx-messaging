@@ -7,7 +7,7 @@
     "doc": "docs"
   },
   "scripts": {
-    "prepublish": "npm run test && tsc",
+    "prepublish": "typings i && tsc",
     "check": "tslint \"src/**/*.ts\"",
     "test": "npm run check && npm run stest && npm run mtest",
     "stest": "jasmine-ts \"src/**/*.s-spec.ts\"",
