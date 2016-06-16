@@ -29,8 +29,7 @@ describe("channeledMessaging", () => {
   describe("fire and forget", () => {
 
     it("should be received by the server", () => {
-      let promise = new Promise<IMessage>(resolve =>
-        server.channel("foo").messages$.subscribe(resolve));
+      let promise = server.channel("foo").messages$.take(1).toPromise();
 
       await(client.send("foo", "bar"));
       let message = await(promise);
@@ -45,11 +44,8 @@ describe("channeledMessaging", () => {
   describe("request and respond", () => {
 
     it("should be processed by client and server", () => {
-      let requestPromise = new Promise<IMessage>(resolve =>
-        server.channel("foo").requests$.subscribe(req => {
-          resolve(req);
-          req.respond("baz");
-        }));
+      let requestPromise = server.channel("foo").requests$.take(1).toPromise();
+      requestPromise.then(req => req.respond("baz"));
 
       let x = await([requestPromise, client.request("foo", "bar").toPromise()]) as any[];
       let request = x[0] as IRequest;
@@ -69,7 +65,7 @@ describe("channeledMessaging", () => {
 
     it("should publish messages on a given channel", () => {
       let channel$ = await(client.subscribe("foo")) as Observable<IMessage>;
-      let promise = new Promise<IMessage>(channel$.subscribe.bind(channel$));
+      let promise = channel$.take(1).toPromise();
       server.publish("foo", "bar");
 
       let message = await(promise);

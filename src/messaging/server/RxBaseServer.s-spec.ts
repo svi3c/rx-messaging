@@ -1,6 +1,6 @@
 import "rxjs/add/operator/finally";
 import {RxBaseServer} from "./RxBaseServer";
-import proxyquire = require("proxyquire");
+import * as proxyquire from "proxyquire";
 import {IMessage, MessageType} from "../RxSocket";
 import {Subject} from "rxjs/Rx";
 

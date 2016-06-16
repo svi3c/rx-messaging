@@ -5,25 +5,24 @@ import {Observable} from "rxjs/Observable";
 import {MessageType, IMessage, IRequest, ISubscribe} from "../RxSocket";
 
 /**
- * A TCP/TLS client socket wrapper which is an Observable emitting incoming messages.
+ * A client for the {@link RxServer}.
  */
 export class RxClient {
 
-  private static nextRequestId = 1;
-  client: RxBaseClient;
+  baseClient: RxBaseClient;
   private channels: Map<String, Observable<IMessage>> = new Map<String, Observable<IMessage>>();
 
   constructor(connectionOptions: RxBaseClient | ITcpConnectionOptions | TlsConnectionOptions) {
-    this.client = (connectionOptions instanceof RxBaseClient) ? connectionOptions : new RxBaseClient(connectionOptions);
+    this.baseClient = (connectionOptions instanceof RxBaseClient) ? connectionOptions : new RxBaseClient(connectionOptions);
   }
 
-  send = (channel: string, data?: any) => this.client.send({
+  send = (channel: string, data?: any) => this.baseClient.send({
     channel,
     data,
     type: MessageType.message
   } as IMessage);
 
-  request = (channel: string, data?: any) => this.client.request({
+  request = (channel: string, data?: any) => this.baseClient.request({
     channel,
     data
   } as IRequest);
@@ -33,9 +32,9 @@ export class RxClient {
     if (channel$) {
       return Promise.resolve(channel$);
     } else {
-      channel$ = (this.client.messages$ as Observable<IMessage>)
+      channel$ = (this.baseClient.messages$ as Observable<IMessage>)
         .filter(message => message.channel === channel);
-      return this.client
+      return this.baseClient
         .subscribe({channel} as ISubscribe).toPromise()
         .then(() => {
           this.channels.set(channel, channel$);
@@ -45,9 +44,9 @@ export class RxClient {
   };
 
   on(event: string, listener: Function) {
-    this.client.on(event, listener);
+    this.baseClient.on(event, listener);
   }
 
-  disconnect = () => this.client.disconnect();
+  disconnect = () => this.baseClient.disconnect();
 
 }
