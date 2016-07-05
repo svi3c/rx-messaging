@@ -52,12 +52,16 @@ export class RxBaseClient {
   /**
    * Starts connecting to the server.
    */
-  connect = () => this._connector.connect();
+  connect() {
+    return this._connector.connect();
+  }
 
   /**
    * Disconnects from the server.
    */
-  disconnect = () => this._connector.disconnect();
+  disconnect() {
+    return this._connector.disconnect();
+  }
 
   /**
    * Sends ta request message to the server and returns an observable for the response.

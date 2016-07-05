@@ -49,8 +49,12 @@ export class RxClient {
     }
   };
 
-  connect = () => this.baseClient.connect();
+  connect() {
+    return this.baseClient.connect();
+  }
 
-  disconnect = () => this.baseClient.disconnect();
+  disconnect() {
+    return this.baseClient.disconnect();
+  }
 
 }
