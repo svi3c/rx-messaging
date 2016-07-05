@@ -1,8 +1,9 @@
-import {ConnectionOptions as TlsConnectionOptions} from "tls";
 import "rxjs/add/operator/share";
-import {RxBaseClient, ITcpConnectionOptions} from "./RxBaseClient";
+import {RxBaseClient} from "./RxBaseClient";
 import {Observable} from "rxjs/Observable";
 import {MessageType, IMessage, IRequest, ISubscribe} from "../RxSocket";
+import {IConnectionOptions, IConnectionEvent} from "./ClientConnector";
+import {BackoffAlgorithm} from "./BackoffAlgorithms";
 
 /**
  * A client for the {@link RxServer}.
@@ -10,10 +11,15 @@ import {MessageType, IMessage, IRequest, ISubscribe} from "../RxSocket";
 export class RxClient {
 
   baseClient: RxBaseClient;
+  events$: Observable<IConnectionEvent>;
   private channels: Map<String, Observable<IMessage>> = new Map<String, Observable<IMessage>>();
 
-  constructor(connectionOptions: RxBaseClient | ITcpConnectionOptions | TlsConnectionOptions) {
-    this.baseClient = (connectionOptions instanceof RxBaseClient) ? connectionOptions : new RxBaseClient(connectionOptions);
+  constructor(connectionOptions: RxBaseClient | IConnectionOptions,
+              reconnectAlgorithm?: BackoffAlgorithm,
+              messageRetryAlgorithm?: BackoffAlgorithm) {
+    this.baseClient = (connectionOptions instanceof RxBaseClient) ? connectionOptions :
+      new RxBaseClient(connectionOptions as IConnectionOptions, reconnectAlgorithm, messageRetryAlgorithm);
+    this.events$ = this.baseClient.events$;
   }
 
   send = (channel: string, data?: any) => this.baseClient.send({
@@ -43,9 +49,7 @@ export class RxClient {
     }
   };
 
-  on(event: string, listener: Function) {
-    this.baseClient.on(event, listener);
-  }
+  connect = () => this.baseClient.connect();
 
   disconnect = () => this.baseClient.disconnect();
 

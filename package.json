@@ -44,6 +44,7 @@
     "jasmine-spec-reporter": "^2.4.0",
     "jasmine-ts": "0.0.2",
     "proxyquire": "^1.7.4",
+    "sinon": "^1.17.4",
     "tslint": "^3.6.0",
     "typescript": "^1.8.10",
     "typings": "^1.0.4"

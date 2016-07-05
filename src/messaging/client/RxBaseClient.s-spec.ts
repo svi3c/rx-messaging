@@ -1,11 +1,14 @@
 import "rxjs/add/operator/finally";
 import {RxBaseClient} from "./RxBaseClient";
 import proxyquire = require("proxyquire");
+import {Subject} from "rxjs/Subject";
 
 describe("RxBaseClient", () => {
 
   let RxSocket;
   let rxSocket;
+  let ClientConnector;
+  let clientConnector;
   let client: RxBaseClient;
   let socket;
   let connectTcp;
@@ -15,11 +18,15 @@ describe("RxBaseClient", () => {
   beforeEach(() => {
     rxSocket = jasmine.createSpyObj("rxSocket", ["filter", "sendMessage"]);
     RxSocket = jasmine.createSpy("RxSocket").and.returnValue(rxSocket);
+    clientConnector = jasmine.createSpyObj("clientConnector", ["connect", "disconnect"]);
+    clientConnector.events$ = new Subject();
+    ClientConnector = jasmine.createSpy("ClientConnector").and.returnValue(clientConnector);
     socket = jasmine.createSpyObj("socket", ["on"]);
     connectTcp = jasmine.createSpy("connect").and.returnValue(socket);
     connectTls = jasmine.createSpy("connect").and.returnValue(socket);
     RxBaseClientConstructor = (proxyquire("./RxBaseClient", {
       "./RxSocket": RxSocket,
+      "./ClientConnector": {ClientConnector},
       "net": {connect: connectTcp},
       "tls": {connect: connectTls}
     }) as {RxBaseClient: typeof RxBaseClient}).RxBaseClient;
@@ -27,14 +34,8 @@ describe("RxBaseClient", () => {
 
   describe("new()", () => {
 
-    it("should immediately start connecting if options are provided", () => {
-      client = new RxBaseClientConstructor({});
-
-      expect(connectTcp).toHaveBeenCalled();
-    });
-
-    it("should not immediately start connecting if no options are provided", () => {
-      client = new RxBaseClientConstructor();
+    it("should not immediately start connecting", () => {
+      client = new RxBaseClientConstructor({port: 1234});
 
       expect(connectTcp).not.toHaveBeenCalled();
     });
@@ -43,24 +44,12 @@ describe("RxBaseClient", () => {
 
   describe("connect()", () => {
 
-    beforeEach(() => {
-      client = new RxBaseClientConstructor();
-    });
+    it("should connect", () => {
+      client = new RxBaseClientConstructor({port: 1234});
 
-    it("should raise an error if no connection options are present", () => {
-      expect(() => client.connect()).toThrowError("No connection options provided");
-    });
+      client.connect();
 
-    it("should connect via tcp when no certificate is passed", () => {
-      client.connect({});
-
-      expect(connectTcp).toHaveBeenCalled();
-    });
-
-    it("should connect via tls when a certificate is passed", () => {
-      client.connect({cert: "foo"});
-
-      expect(connectTls).toHaveBeenCalled();
+      expect(clientConnector.connect).toHaveBeenCalled();
     });
 
   });
