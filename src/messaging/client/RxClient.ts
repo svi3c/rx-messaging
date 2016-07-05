@@ -4,6 +4,7 @@ import {Observable} from "rxjs/Observable";
 import {MessageType, IMessage, IRequest, ISubscribe} from "../RxSocket";
 import {IConnectionOptions, IConnectionEvent} from "./ClientConnector";
 import {BackoffAlgorithm} from "./BackoffAlgorithms";
+import {RxSocket} from "../RxSocket";
 
 /**
  * A client for the {@link RxServer}.
@@ -49,7 +50,7 @@ export class RxClient {
     }
   };
 
-  connect() {
+  connect(): Promise<RxSocket> {
     return this.baseClient.connect();
   }
 

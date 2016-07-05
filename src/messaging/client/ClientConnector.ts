@@ -5,6 +5,7 @@ import {Observer} from "rxjs/Observer";
 import {Subject} from "rxjs/Subject";
 import {Subscription} from "rxjs/Subscription";
 import {BackoffAlgorithm} from "./BackoffAlgorithms";
+import {RxSocket} from "../RxSocket";
 
 export interface IConnectionOptions extends ConnectionOptions {
   port: number;
@@ -51,7 +52,7 @@ export class ClientConnector {
    * @returns {Promise<Socket>}
    */
   connect(delay = 0) {
-    return new Promise<Socket>((resolve, reject) => {
+    return new Promise<RxSocket>((resolve, reject) => {
       this._timeout = setTimeout(() => {
         let connect: any = this.connectionOptions.cert ? connectTls : connectTcp;
         this._timeout = null;
@@ -65,7 +66,7 @@ export class ClientConnector {
               reject(event.payload);
               break;
             case ConnectionEventType.connect:
-              resolve(event.payload as Socket);
+              resolve(new RxSocket(event.payload));
               break;
           }
         });
