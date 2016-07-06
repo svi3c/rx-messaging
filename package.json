@@ -2,7 +2,6 @@
   "name": "rx-messaging",
   "version": "0.0.1",
   "description": "A channeled messaging protocol implementation on top of TCP/TLS server and socket to enable rxjs messaging",
-  "main": "dist/messaging.js",
   "directories": {
     "doc": "docs"
   },
@@ -10,8 +9,8 @@
     "prepublish": "typings i && tsc",
     "check": "tslint \"src/**/*.ts\"",
     "test": "npm run check && npm run stest && npm run mtest",
-    "stest": "jasmine-ts \"src/**/*.s-spec.ts\"",
-    "mtest": "jasmine-ts \"src/**/*.m-spec.ts\""
+    "stest": "jasmine-ts \"**/*.s-spec.ts\"",
+    "mtest": "jasmine-ts \"**/*.m-spec.ts\""
   },
   "repository": {
     "type": "git",

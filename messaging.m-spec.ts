@@ -4,7 +4,7 @@ import {
   it,
   await
 } from "jasmine-await";
-import {RxServer, RxClient} from "./messaging";
+import {RxServer, RxClient} from "./index";
 import {Observable} from "rxjs/Observable";
 import {MessageType, IMessage, IRequest, IResponse} from "./messaging/RxSocket";
 import {ConnectionEventType} from "./messaging/client/ClientConnector";

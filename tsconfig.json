@@ -5,11 +5,10 @@
     "declaration": true,
     "removeComments": true,
     "moduleResolution": "node",
-    "sourceMap": true,
-    "outDir": "lib"
+    "sourceMap": true
   },
   "files": [
     "typings/index.d.ts",
-    "src/messaging.ts"
+    "index.ts"
   ]
 }
