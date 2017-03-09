@@ -34,13 +34,13 @@
   },
   "homepage": "https://github.com/svi3c/rx-messaging#readme",
   "dependencies": {
-    "jasmine-promise-wrapper": "^0.0.2",
     "json-socket": "^0.2.1",
     "rxjs": "^5.2.0"
   },
   "devDependencies": {
     "@types/jasmine": "^2.5.43",
     "@types/node": "^7.0.7",
+    "jasmine-promise-wrapper": "^0.0.2",
     "jasmine-spec-reporter": "^2.4.0",
     "jasmine-ts": "^0.0.3",
     "proxyquire": "^1.7.4",
