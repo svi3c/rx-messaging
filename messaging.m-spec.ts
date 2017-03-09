@@ -1,9 +1,8 @@
 import {
   beforeEach,
   afterEach,
-  it,
-  await
-} from "jasmine-await";
+  it
+} from "jasmine-promise-wrapper";
 import {RxServer, RxClient} from "./index";
 import {Observable} from "rxjs/Observable";
 import {MessageType, IMessage, IRequest, IResponse} from "./messaging/RxSocket";
@@ -34,9 +33,9 @@ describe("channeledMessaging", () => {
 
   describe("connected", () => {
 
-    beforeEach(() => {
-      await(startServer());
-      await(connect());
+    beforeEach(async () => {
+      await startServer();
+      await connect();
     });
 
     afterEach(() =>
@@ -45,11 +44,11 @@ describe("channeledMessaging", () => {
 
     describe("fire and forget", () => {
 
-      it("should be received by the server", () => {
+      it("should be received by the server", async () => {
         let promise = server.channel("foo").messages$.take(1).toPromise();
 
-        await(client.send("foo", "bar"));
-        let message = await(promise);
+        await client.send("foo", "bar");
+        let message = await promise;
 
         expect(message.channel).toEqual("foo");
         expect(message.data).toEqual("bar");
@@ -60,11 +59,11 @@ describe("channeledMessaging", () => {
 
     describe("request and respond", () => {
 
-      it("should be processed by client and server", () => {
+      it("should be processed by client and server", async () => {
         let requestPromise = server.channel("foo").requests$.take(1).toPromise();
         requestPromise.then(req => req.respond("baz"));
 
-        let x = await([requestPromise, client.request("foo", "bar").toPromise()]) as any[];
+        let x = await Promise.all([requestPromise, client.request("foo", "bar").toPromise()]);
         let request = x[0] as IRequest;
         let response = x[1] as IResponse;
 
@@ -80,12 +79,12 @@ describe("channeledMessaging", () => {
 
     describe("pub sub", () => {
 
-      it("should publish messages on a given channel", () => {
-        let channel$ = await(client.subscribe("foo")) as Observable<IMessage>;
+      it("should publish messages on a given channel", async () => {
+        let channel$ = await client.subscribe("foo") as Observable<IMessage>;
         let promise = channel$.take(1).toPromise();
         server.publish("foo", "bar");
 
-        let message = await(promise);
+        let message = await promise;
 
         expect(message.channel).toEqual("foo");
         expect(message.data).toEqual("bar");

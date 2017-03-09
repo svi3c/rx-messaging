@@ -1,7 +1,7 @@
 import {RxSocket, MessageType, IMessage} from "./RxSocket";
 import proxyquire = require("proxyquire");
 import JsonSocket = require("json-socket");
-import {it, invert} from "jasmine-await";
+import {it, invert} from "jasmine-promise-wrapper";
 import {TypedError} from "./Error";
 
 describe("RxSocket", () => {
