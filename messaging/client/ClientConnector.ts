@@ -109,7 +109,8 @@ export class ClientConnector {
       this.socket = null;
       this._eventsObserver.next({type: ConnectionEventType.close});
       this._connectionBackoff = this._connectionBackoff || this.reconnectAlgorithm && this.reconnectAlgorithm();
-      this.connect(this._connectionBackoff ? this._connectionBackoff.next().value : 0);
+      this.connect(this._connectionBackoff ? this._connectionBackoff.next().value : 0)
+        .catch(() => {});
     });
   }
 

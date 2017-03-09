@@ -22,7 +22,11 @@ describe("channeledMessaging", () => {
   function connect(reconnect?: BackoffAlgorithm, resend?: BackoffAlgorithm) {
     return new Promise<void>(resolve => {
       client = new RxClient({port: 11115, host: "localhost"}, reconnect, resend);
-      client.connect();
+      client.connect().catch(e => {
+        if (e.code !== "ECONNREFUSED") {
+          console.log(e);
+        }
+      });
       client.events$.subscribe(event => {
         if (event.type === ConnectionEventType.connect) {
           resolve();
