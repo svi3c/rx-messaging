@@ -1,11 +1,12 @@
 {
   "name": "rx-messaging",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A channeled messaging protocol implementation on top of TCP/TLS server and socket to enable rxjs messaging",
   "directories": {
     "doc": "docs"
   },
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "prepublish": "tsc",
     "check": "tslint \"src/**/*.ts\" -t verbose",
