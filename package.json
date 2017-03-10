@@ -1,6 +1,6 @@
 {
   "name": "rx-messaging",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "A channeled messaging protocol implementation on top of TCP/TLS server and socket to enable rxjs messaging",
   "directories": {
     "doc": "docs"
