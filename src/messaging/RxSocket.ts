@@ -1,10 +1,11 @@
-import {Observable} from "rxjs/Observable";
-import {Observer} from "rxjs/Observer";
+import { Observable } from "rxjs/Observable";
+import { Observer } from "rxjs/Observer";
 import JsonSocket = require("json-socket");
-import {Socket} from "net";
-import {IErrorData} from "./Error";
+import { Socket } from "net";
+import { IErrorData } from "./Error";
 import "rxjs/add/operator/share";
-import {isDefined} from "./utils";
+import { isDefined } from "./utils";
+import { EventEmitter } from "events";
 
 export enum MessageType {
   subscribe,
@@ -46,17 +47,18 @@ interface ISerializedMessage {
   t: MessageType; // type
 }
 
-export class RxSocket {
+export class RxSocket extends EventEmitter {
 
   messages$: Observable<IMessage>;
-  jsonSocket: JsonSocket;
+  private jsonSocket: JsonSocket;
 
-  constructor(socket: Socket)
-  constructor(jsonSocket: JsonSocket) {
-    this.jsonSocket = jsonSocket.sendMessage ? jsonSocket : new JsonSocket(jsonSocket as any as Socket);
+  constructor(socket: Socket) {
+    super();
+    this.jsonSocket = new JsonSocket(socket);
     let observer: Observer<IMessage>;
     this.messages$ = new Observable<IMessage>(o => observer = o).share();
-    jsonSocket.on("message", msg => observer.next(this.parseMessage(msg)));
+    this.jsonSocket.on("message", msg => observer.next(this.parseMessage(msg)));
+    this.jsonSocket.on("close", () => this.emit("close"));
   }
 
   send = (message: IMessage) =>

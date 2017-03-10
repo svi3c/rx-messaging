@@ -1,8 +1,6 @@
 /*.iml
 /.idea
-*.js
-*.d.ts
-*.js.map
 /typings
 /node_modules
 /npm-debug.log
+/dist

@@ -5,6 +5,7 @@
   "directories": {
     "doc": "docs"
   },
+  "main": "dist/index.js",
   "scripts": {
     "prepublish": "tsc",
     "check": "tslint \"src/**/*.ts\"",
@@ -39,6 +40,7 @@
   },
   "devDependencies": {
     "@types/jasmine": "^2.5.43",
+    "@types/json-socket": "^0.1.15",
     "@types/node": "^7.0.7",
     "jasmine-promise-wrapper": "^0.0.2",
     "jasmine-spec-reporter": "^2.4.0",

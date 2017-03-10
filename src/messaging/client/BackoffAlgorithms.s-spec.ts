@@ -1,11 +1,11 @@
-import {linear, exponential, random} from "./BackoffAlgorithms";
+import { linear, exponential, random } from "./BackoffAlgorithms";
 
 describe("BackoffAlgorithms", () => {
 
   describe("linear", () => {
 
     it("should generate correct values", () => {
-      let iterator = linear({from: 0, to: 100, factor: 20})();
+      let iterator = linear({ from: 0, to: 100, factor: 20 })();
 
       expect(iterator.next().value).toEqual(0);
       expect(iterator.next().value).toEqual(20);
@@ -40,7 +40,7 @@ describe("BackoffAlgorithms", () => {
   describe("exponential", () => {
 
     it("should generate correct values", () => {
-      let iterator = exponential({from: 1, to: 32, factor: 1, base: 2})();
+      let iterator = exponential({ from: 1, to: 32, factor: 1, base: 2 })();
 
       expect(iterator.next().value).toEqual(1);
       expect(iterator.next().value).toEqual(2);
@@ -82,7 +82,7 @@ describe("BackoffAlgorithms", () => {
     }
 
     it("should generate correct values", () => {
-      let iterator = random({from: 0, to: 2})();
+      let iterator = random({ from: 0, to: 2 })();
 
       expect(isBetween(iterator.next().value, 0, 2)).toBeTruthy();
       expect(isBetween(iterator.next().value, 0, 2)).toBeTruthy();

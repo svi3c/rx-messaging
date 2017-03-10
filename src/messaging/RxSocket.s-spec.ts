@@ -1,8 +1,8 @@
-import {RxSocket, MessageType, IMessage} from "./RxSocket";
+import { RxSocket, MessageType, IMessage } from "./RxSocket";
 import proxyquire = require("proxyquire");
 import JsonSocket = require("json-socket");
-import {it, invert} from "jasmine-promise-wrapper";
-import {TypedError} from "./Error";
+import { it, invert } from "jasmine-promise-wrapper";
+import { TypedError } from "./Error";
 
 describe("RxSocket", () => {
 
@@ -10,9 +10,13 @@ describe("RxSocket", () => {
   let jsonSocket: any;
 
   beforeEach(() => {
-    let module = proxyquire("./RxSocket", {}) as {RxSocket: typeof RxSocket};
-    jsonSocket = jasmine.createSpyObj("jsonSocket", ["on", "sendMessage"]);
-    socket = new module.RxSocket(jsonSocket as JsonSocket);
+    let module = proxyquire("./RxSocket", {
+      "json-socket": function () {
+        jsonSocket = jasmine.createSpyObj("jsonSocket", ["on", "sendMessage"]);
+        return jsonSocket;
+      }
+    }) as { RxSocket: typeof RxSocket };
+    socket = new module.RxSocket(null);
   });
 
   describe("on('message')", () => {
@@ -23,12 +27,12 @@ describe("RxSocket", () => {
 
       receiveMessage({
         t: MessageType.message,
-        d: {foo: "bar"}
+        d: { foo: "bar" }
       });
 
       expect(message).toEqual(jasmine.objectContaining({
         type: MessageType.message,
-        data: {foo: "bar"}
+        data: { foo: "bar" }
       }));
     });
 
@@ -39,19 +43,19 @@ describe("RxSocket", () => {
     it("should serialize messages", () => {
       socket.send({
         type: MessageType.message,
-        data: {foo: "bar"}
+        data: { foo: "bar" }
       });
 
       expect(jsonSocket.sendMessage).toHaveBeenCalledWith({
         t: MessageType.message,
-        d: {foo: "bar"}
+        d: { foo: "bar" }
       }, jasmine.any(Function));
     });
 
     it("should resolve if no error occurs", () => {
       let promise = socket.send({
         type: MessageType.message,
-        data: {foo: "bar"}
+        data: { foo: "bar" }
       });
 
       jsonSocket.sendMessage.calls.mostRecent().args[1]();
@@ -62,7 +66,7 @@ describe("RxSocket", () => {
     it("should reject if an error occurs", () => {
       let promise = socket.send({
         type: MessageType.message,
-        data: {foo: "bar"}
+        data: { foo: "bar" }
       });
 
       jsonSocket.sendMessage.calls.mostRecent().args[1](new Error("foo"));
@@ -75,11 +79,11 @@ describe("RxSocket", () => {
       let error = new TypedError("x", "foo");
 
       it("should call jsonSocket.sendMessage() with the given error", () => {
-        socket.send({error: error, type: MessageType.message});
+        socket.send({ error: error, type: MessageType.message });
 
         expect(jsonSocket.sendMessage).toHaveBeenCalledWith({
           t: MessageType.message,
-          e: {c: "x", m: "foo"}
+          e: { c: "x", m: "foo" }
         }, jasmine.any(Function));
       });
 
@@ -88,7 +92,7 @@ describe("RxSocket", () => {
   });
 
   function receiveMessage(message: any) {
-    jsonSocket.on.calls.mostRecent().args[1](message);
+    jsonSocket.on.calls.first().args[1](message);
   }
 
 });

@@ -1,8 +1,8 @@
-import {RxServer} from "./RxServer";
+import { RxServer } from "./RxServer";
 import proxyquire = require("proxyquire");
-import {Subject} from "rxjs/Subject";
-import {RxBaseServer} from "./RxBaseServer";
-import {MessageType} from "../RxSocket";
+import { Subject } from "rxjs/Subject";
+import { RxBaseServer } from "./RxBaseServer";
+import { MessageType } from "../RxSocket";
 
 describe("RxServer", () => {
 
@@ -13,12 +13,12 @@ describe("RxServer", () => {
   let server: RxServer;
 
   beforeEach(() => {
-    let module = proxyquire("./RxServer", {}) as {RxServer: typeof RxServer};
+    let module = proxyquire("./RxServer", {}) as { RxServer: typeof RxServer };
     messages$ = new Subject();
     requests$ = new Subject();
     subscribes$ = new Subject();
     unsubscribes$ = new Subject();
-    server = new module.RxServer({messages$, requests$, subscribes$, unsubscribes$} as any as RxBaseServer);
+    server = new module.RxServer({ messages$, requests$, subscribes$, unsubscribes$ } as any as RxBaseServer);
   });
 
   describe("channel()", () => {
@@ -31,9 +31,9 @@ describe("RxServer", () => {
       server.channel("bar").messages$.subscribe(m => barMessage = m);
       server.channel("baz").messages$.subscribe(m => bazMessage = m);
 
-      messages$.next({channel: "foo", data: "foo"});
-      messages$.next({channel: "bar", data: "bar"});
-      messages$.next({channel: "baz", data: "baz"});
+      messages$.next({ channel: "foo", data: "foo" });
+      messages$.next({ channel: "bar", data: "bar" });
+      messages$.next({ channel: "baz", data: "baz" });
 
       expect(fooMessage.data).toEqual("foo");
       expect(barMessage.data).toEqual("bar");
@@ -48,22 +48,21 @@ describe("RxServer", () => {
     let respond: any;
 
     beforeEach(() => {
-      socket = jasmine.createSpyObj("socket", ["send"]);
-      socket.jsonSocket = jasmine.createSpyObj("jsonSocket", ["on"]);
+      socket = jasmine.createSpyObj("socket", ["send", "on"]);
       respond = jasmine.createSpy("respond");
-      subscribes$.next({channel: "foo", socket, respond});
+      subscribes$.next({ channel: "foo", socket, respond });
     });
 
     it("should publish a message to subscribed clients", () => {
-      server.publish("foo", {bar: "baz"});
+      server.publish("foo", { bar: "baz" });
 
-      expect(socket.send).toHaveBeenCalledWith({channel: "foo", data: {bar: "baz"}, type: MessageType.message});
+      expect(socket.send).toHaveBeenCalledWith({ channel: "foo", data: { bar: "baz" }, type: MessageType.message });
     });
 
     it("should not publish messages to unsubscribed clients", () => {
-      unsubscribes$.next({channel: "foo", socket, respond});
+      unsubscribes$.next({ channel: "foo", socket, respond });
 
-      server.publish("foo", {bar: "baz"});
+      server.publish("foo", { bar: "baz" });
 
       expect(socket.send).not.toHaveBeenCalled();
     });

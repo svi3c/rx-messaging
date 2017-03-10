@@ -1,13 +1,12 @@
-import JsonSocket = require("json-socket");
-import {createServer as createTlsServer, TlsOptions} from "tls";
-import {createServer as createTcpServer, Server, Socket} from "net";
-import {Observable} from "rxjs/Observable";
+import { createServer as createTlsServer, TlsOptions } from "tls";
+import { createServer as createTcpServer, Server, Socket } from "net";
+import { Observable } from "rxjs/Observable";
 import {
   RxSocket, MessageType, IResponse, IMessage, IRequest, IUnsubscribe, ISubscribe
 } from "../RxSocket";
 import "rxjs/add/operator/share";
-import {Subject} from "rxjs/Rx";
-import {IErrorData} from "../Error";
+import { Subject } from "rxjs/Rx";
+import { IErrorData } from "../Error";
 
 export type IIncomingSubscribe = IIncomingMessage & ISubscribe;
 export type IIncomingUnsubscribe = IIncomingMessage & IUnsubscribe;
@@ -103,7 +102,7 @@ export class RxBaseServer implements IServerMessageSource {
       .share();
 
     this.server.on("connection", (socket: Socket) => {
-      let rxSocket = new RxSocket(new JsonSocket(socket));
+      let rxSocket = new RxSocket(socket);
       rxSocket.messages$.subscribe(subject);
     });
   }

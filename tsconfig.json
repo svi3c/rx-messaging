@@ -5,9 +5,10 @@
     "declaration": true,
     "removeComments": true,
     "moduleResolution": "node",
-    "sourceMap": true
+    "sourceMap": true,
+    "outDir": "dist"
   },
   "files": [
-    "index.ts"
+    "src/index.ts"
   ]
 }

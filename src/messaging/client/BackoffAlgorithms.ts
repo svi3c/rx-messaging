@@ -12,7 +12,7 @@ const defaultBackoffOptions: IBackoffOptions = {
 
 // Constant backoff
 
-function *constantGenerator(constant: number) {
+function* constantGenerator(constant: number) {
   while (true) {
     yield constant;
   }
@@ -33,7 +33,7 @@ const defaultLinearReconnectOptions: ILinearBackoffOptions = {
   factor: 500
 };
 
-function *linearGenerator(opts?: ILinearBackoffOptions) {
+function* linearGenerator(opts?: ILinearBackoffOptions) {
   opts = Object.assign({}, defaultBackoffOptions, defaultLinearReconnectOptions, opts);
   let lastValue = opts.from;
   while (lastValue < opts.to) {
@@ -64,7 +64,7 @@ const defaultExponentialBackoffOptions: IExponentialBackoffOptions = {
   factor: 1
 };
 
-function *exponentialGenerator(opts?: IExponentialBackoffOptions) {
+function* exponentialGenerator(opts?: IExponentialBackoffOptions) {
   opts = Object.assign({}, defaultBackoffOptions, defaultExponentialBackoffOptions, opts);
   let factorTimesBase = opts.factor;
   let lastValue = opts.from;
@@ -91,7 +91,7 @@ export interface IRandomBackoffOptions extends IBackoffOptions {
 
 const defaultRandomBackoffOptions: IExponentialBackoffOptions = {};
 
-function *randomGenerator(opts?: IRandomBackoffOptions) {
+function* randomGenerator(opts?: IRandomBackoffOptions) {
   opts = Object.assign({}, defaultBackoffOptions, defaultRandomBackoffOptions, opts);
   while (true) {
     yield Math.round(Math.random() * (opts.to - opts.from) + opts.from);

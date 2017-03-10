@@ -1,7 +1,7 @@
 import "rxjs/add/operator/finally";
-import {RxBaseClient} from "./RxBaseClient";
+import { RxBaseClient } from "./RxBaseClient";
 import proxyquire = require("proxyquire");
-import {Subject} from "rxjs/Subject";
+import { Subject } from "rxjs/Subject";
 
 describe("RxBaseClient", () => {
 
@@ -26,16 +26,16 @@ describe("RxBaseClient", () => {
     connectTls = jasmine.createSpy("connect").and.returnValue(socket);
     RxBaseClientConstructor = (proxyquire("./RxBaseClient", {
       "./RxSocket": RxSocket,
-      "./ClientConnector": {ClientConnector},
-      "net": {connect: connectTcp},
-      "tls": {connect: connectTls}
-    }) as {RxBaseClient: typeof RxBaseClient}).RxBaseClient;
+      "./ClientConnector": { ClientConnector },
+      "net": { connect: connectTcp },
+      "tls": { connect: connectTls }
+    }) as { RxBaseClient: typeof RxBaseClient }).RxBaseClient;
   });
 
   describe("new()", () => {
 
     it("should not immediately start connecting", () => {
-      client = new RxBaseClientConstructor({port: 1234});
+      client = new RxBaseClientConstructor({ port: 1234 });
 
       expect(connectTcp).not.toHaveBeenCalled();
     });
@@ -45,7 +45,7 @@ describe("RxBaseClient", () => {
   describe("connect()", () => {
 
     it("should connect", () => {
-      client = new RxBaseClientConstructor({port: 1234});
+      client = new RxBaseClientConstructor({ port: 1234 });
 
       client.connect();
 

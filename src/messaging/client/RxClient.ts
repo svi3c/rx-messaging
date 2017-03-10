@@ -1,10 +1,10 @@
 import "rxjs/add/operator/share";
-import {RxBaseClient} from "./RxBaseClient";
-import {Observable} from "rxjs/Observable";
-import {MessageType, IMessage, IRequest, ISubscribe} from "../RxSocket";
-import {IConnectionOptions, IConnectionEvent} from "./ClientConnector";
-import {BackoffAlgorithm} from "./BackoffAlgorithms";
-import {RxSocket} from "../RxSocket";
+import { RxBaseClient } from "./RxBaseClient";
+import { Observable } from "rxjs/Observable";
+import { MessageType, IMessage, IRequest, ISubscribe } from "../RxSocket";
+import { IConnectionOptions, IConnectionEvent } from "./ClientConnector";
+import { BackoffAlgorithm } from "./BackoffAlgorithms";
+import { RxSocket } from "../RxSocket";
 
 /**
  * A client for the {@link RxServer}.
@@ -16,8 +16,8 @@ export class RxClient {
   private channels: Map<String, Observable<IMessage>> = new Map<String, Observable<IMessage>>();
 
   constructor(connectionOptions: RxBaseClient | IConnectionOptions,
-              reconnectAlgorithm?: BackoffAlgorithm,
-              messageRetryAlgorithm?: BackoffAlgorithm) {
+    reconnectAlgorithm?: BackoffAlgorithm,
+    messageRetryAlgorithm?: BackoffAlgorithm) {
     this.baseClient = (connectionOptions instanceof RxBaseClient) ? connectionOptions :
       new RxBaseClient(connectionOptions as IConnectionOptions, reconnectAlgorithm, messageRetryAlgorithm);
     this.events$ = this.baseClient.events$;
@@ -42,7 +42,7 @@ export class RxClient {
       channel$ = (this.baseClient.messages$ as Observable<IMessage>)
         .filter(message => message.channel === channel);
       return this.baseClient
-        .subscribe({channel} as ISubscribe).toPromise()
+        .subscribe({ channel } as ISubscribe).toPromise()
         .then(() => {
           this.channels.set(channel, channel$);
           return channel$;

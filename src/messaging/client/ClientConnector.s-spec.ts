@@ -1,6 +1,6 @@
 import "rxjs/add/operator/finally";
 import proxyquire = require("proxyquire");
-import {ClientConnector} from "./ClientConnector";
+import { ClientConnector } from "./ClientConnector";
 import * as sinon from "sinon";
 
 describe("ClientConnector", () => {
@@ -22,9 +22,9 @@ describe("ClientConnector", () => {
     connectTls = jasmine.createSpy("connect").and.returnValue(socket);
     clock = sinon.useFakeTimers();
     ClientConnectorConstructor = (proxyquire("./ClientConnector", {
-      "net": {connect: connectTcp},
-      "tls": {connect: connectTls}
-    }) as {ClientConnector: typeof ClientConnector}).ClientConnector;
+      "net": { connect: connectTcp },
+      "tls": { connect: connectTls }
+    }) as { ClientConnector: typeof ClientConnector }).ClientConnector;
   });
 
   afterEach(() => {
@@ -34,7 +34,7 @@ describe("ClientConnector", () => {
   describe("connect()", () => {
 
     it("should connect via tcp when no certificate is passed", () => {
-      connector = new ClientConnectorConstructor({port: 1234});
+      connector = new ClientConnectorConstructor({ port: 1234 });
 
       connector.connect();
       clock.tick();
@@ -43,7 +43,7 @@ describe("ClientConnector", () => {
     });
 
     it("should connect via tls when a certificate is passed", () => {
-      connector = new ClientConnectorConstructor({port: 1234, cert: "cert"});
+      connector = new ClientConnectorConstructor({ port: 1234, cert: "cert" });
 
       connector.connect();
       clock.tick();
@@ -52,7 +52,7 @@ describe("ClientConnector", () => {
     });
 
     it("should reconnect if the connection closes", () => {
-      connector = new ClientConnectorConstructor({port: 1234}, constantBackoff);
+      connector = new ClientConnectorConstructor({ port: 1234 }, constantBackoff);
       connector.connect();
       clock.tick();
 

@@ -1,8 +1,8 @@
 import "rxjs/add/operator/finally";
-import {RxBaseServer} from "./RxBaseServer";
+import { RxBaseServer } from "./RxBaseServer";
 import * as proxyquire from "proxyquire";
-import {IMessage, MessageType} from "../RxSocket";
-import {Subject} from "rxjs/Rx";
+import { IMessage, MessageType } from "../RxSocket";
+import { Subject } from "rxjs/Rx";
 
 describe("RxBaseServer", () => {
 
@@ -26,7 +26,7 @@ describe("RxBaseServer", () => {
           return rxSocket;
         }
       }
-    }) as {RxBaseServer: typeof RxBaseServer};
+    }) as { RxBaseServer: typeof RxBaseServer };
     rxBaseServer = new module.RxBaseServer(server);
     connect();
     message = null;
@@ -35,7 +35,7 @@ describe("RxBaseServer", () => {
   it("should emit the message if the server retrieves it", () => {
     rxBaseServer.messages$.subscribe(m => message = m);
 
-    sendMessage({data: "foo", type: MessageType.message});
+    sendMessage({ data: "foo", type: MessageType.message });
 
     expect(message.data).toEqual("foo");
     expect(message.type).toEqual(MessageType.message);
@@ -44,7 +44,7 @@ describe("RxBaseServer", () => {
   it("should emit the request if the server retrieves it", () => {
     rxBaseServer.requests$.subscribe(m => message = m);
 
-    sendMessage({data: "foo", type: MessageType.request});
+    sendMessage({ data: "foo", type: MessageType.request });
 
     expect(message.data).toEqual("foo");
     expect(message.type).toEqual(MessageType.request);
@@ -53,7 +53,7 @@ describe("RxBaseServer", () => {
   it("should emit the subscription if the server retrieves it", () => {
     rxBaseServer.subscribes$.subscribe(m => message = m);
 
-    sendMessage({type: MessageType.subscribe});
+    sendMessage({ type: MessageType.subscribe });
 
     expect(message.type).toEqual(MessageType.subscribe);
   });
@@ -61,7 +61,7 @@ describe("RxBaseServer", () => {
   it("should emit the unsubscription if the server retrieves it", () => {
     rxBaseServer.unsubscribes$.subscribe(m => message = m);
 
-    sendMessage({type: MessageType.unsubscribe});
+    sendMessage({ type: MessageType.unsubscribe });
 
     expect(message.type).toEqual(MessageType.unsubscribe);
   });

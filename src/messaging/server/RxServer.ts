@@ -1,12 +1,12 @@
-import {Observable} from "rxjs/Observable";
+import { Observable } from "rxjs/Observable";
 import "rxjs/add/operator/filter";
 import {
   RxBaseServer, IServerMessageSource, IIncomingMessage, IIncomingRequest,
   IIncomingSubscribe, IIncomingUnsubscribe
 } from "./RxBaseServer";
-import {TlsOptions} from "tls";
-import {Server} from "net";
-import {RxSocket, IMessage, MessageType} from "../RxSocket";
+import { TlsOptions } from "tls";
+import { Server } from "net";
+import { RxSocket, IMessage, MessageType } from "../RxSocket";
 import "rxjs/add/operator/share";
 
 class OutboundChannels {
@@ -19,7 +19,7 @@ class OutboundChannels {
       this.channels.set(channelName, channel);
     }
     channel.add(socket);
-    socket.jsonSocket.on("close", () =>
+    socket.on("close", () =>
       this.unsubscribe(channelName, socket));
   }
 
@@ -109,7 +109,7 @@ export class RxServer implements IServerMessageSource {
   }
 
   publish(channel: string, data?: any) {
-    this.outboundChannels.publish(channel, {data, type: MessageType.message});
+    this.outboundChannels.publish(channel, { data, type: MessageType.message });
   }
 
   listen = (port: number) => this.baseServer.listen(port);

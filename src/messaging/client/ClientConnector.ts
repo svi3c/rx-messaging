@@ -1,11 +1,11 @@
-import {connect as connectTls, ConnectionOptions} from "tls";
-import {connect as connectTcp, Socket} from "net";
-import {Observable} from "rxjs/Observable";
-import {Observer} from "rxjs/Observer";
-import {Subject} from "rxjs/Subject";
-import {Subscription} from "rxjs/Subscription";
-import {BackoffAlgorithm} from "./BackoffAlgorithms";
-import {RxSocket} from "../RxSocket";
+import { connect as connectTls, ConnectionOptions } from "tls";
+import { connect as connectTcp, Socket } from "net";
+import { Observable } from "rxjs/Observable";
+import { Observer } from "rxjs/Observer";
+import { Subject } from "rxjs/Subject";
+import { Subscription } from "rxjs/Subscription";
+import { BackoffAlgorithm } from "./BackoffAlgorithms";
+import { RxSocket } from "../RxSocket";
 
 export interface IConnectionOptions extends ConnectionOptions {
   port: number;
@@ -40,7 +40,7 @@ export class ClientConnector {
    * @param reconnectAlgorithm
    */
   constructor(public connectionOptions: IConnectionOptions,
-              public reconnectAlgorithm?: BackoffAlgorithm) {
+    public reconnectAlgorithm?: BackoffAlgorithm) {
     let subject = new Subject<IConnectionEvent>();
     this._eventsObserver = subject;
     this.events$ = subject.asObservable();
@@ -97,20 +97,20 @@ export class ClientConnector {
 
   private _attachListenersToSocket() {
     this.socket.on("connect", () => {
-      this._eventsObserver.next({type: ConnectionEventType.connect, payload: this.socket});
+      this._eventsObserver.next({ type: ConnectionEventType.connect, payload: this.socket });
       this._connectionBackoff = null;
     });
     this.socket.on("error", err => {
       this.socket.destroy();
-      this._eventsObserver.next({type: ConnectionEventType.error, payload: err});
+      this._eventsObserver.next({ type: ConnectionEventType.error, payload: err });
     });
     this.socket.on("close", () => {
       this.socket.removeAllListeners();
       this.socket = null;
-      this._eventsObserver.next({type: ConnectionEventType.close});
+      this._eventsObserver.next({ type: ConnectionEventType.close });
       this._connectionBackoff = this._connectionBackoff || this.reconnectAlgorithm && this.reconnectAlgorithm();
       this.connect(this._connectionBackoff ? this._connectionBackoff.next().value : 0)
-        .catch(() => {});
+        .catch(() => { });
     });
   }
 
