@@ -1,11 +1,11 @@
 import { Observable } from "rxjs/Observable";
 import { Observer } from "rxjs/Observer";
 import JsonSocket = require("json-socket");
-import { Socket } from "net";
-import { IErrorData } from "./Error";
-import "rxjs/add/operator/share";
-import { isDefined } from "./utils";
 import { EventEmitter } from "events";
+import { Socket } from "net";
+import "rxjs/add/operator/share";
+import { IErrorData } from "./Error";
+import { isDefined } from "./utils";
 
 export enum MessageType {
   subscribe,
@@ -56,8 +56,8 @@ export class RxSocket extends EventEmitter {
     super();
     this.jsonSocket = new JsonSocket(socket);
     let observer: Observer<IMessage>;
-    this.messages$ = new Observable<IMessage>(o => observer = o).share();
-    this.jsonSocket.on("message", msg => observer.next(this.parseMessage(msg)));
+    this.messages$ = new Observable<IMessage>((o) => observer = o).share();
+    this.jsonSocket.on("message", (msg) => observer.next(this.parseMessage(msg)));
     this.jsonSocket.on("close", () => this.emit("close"));
   }
 
@@ -67,38 +67,46 @@ export class RxSocket extends EventEmitter {
 
   private parseMessage = (msg: ISerializedMessage) => {
     let message = {
+      socket: this,
       type: msg.t,
-      socket: this
     } as IMessage;
-    if (isDefined(msg.d))
+    if (isDefined(msg.d)) {
       message.data = msg.d;
-    if (isDefined(msg.e))
+    }
+    if (isDefined(msg.e)) {
       message.error = {
+        code: msg.e.c,
         message: msg.e.m,
-        code: msg.e.c
       };
-    if (isDefined(msg.c))
+    }
+    if (isDefined(msg.c)) {
       message.channel = msg.c;
-    if (isDefined(msg.i))
+    }
+    if (isDefined(msg.i)) {
       (message as IRequest).id = msg.i;
+    }
     return message;
-  };
+  }
 
   private serializeMessage = (msg: IMessage) => {
     let message: ISerializedMessage = {
-      t: msg.type
+      t: msg.type,
     };
-    if (isDefined(msg.data))
+    if (isDefined(msg.data)) {
       message.d = msg.data;
-    if (isDefined(msg.error))
+    }
+    if (isDefined(msg.error)) {
       message.e = {
+        c: msg.error.code,
         m: msg.error.message,
-        c: msg.error.code
       };
-    if (isDefined(msg.channel))
+    }
+    if (isDefined(msg.channel)) {
       message.c = msg.channel;
-    if (isDefined((msg as IRequest).id))
+    }
+    if (isDefined((msg as IRequest).id)) {
       message.i = (msg as IRequest).id;
+    }
     return message;
   }
 

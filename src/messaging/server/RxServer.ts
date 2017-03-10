@@ -1,13 +1,13 @@
-import { Observable } from "rxjs/Observable";
-import "rxjs/add/operator/filter";
-import {
-  RxBaseServer, IServerMessageSource, IIncomingMessage, IIncomingRequest,
-  IIncomingSubscribe, IIncomingUnsubscribe
-} from "./RxBaseServer";
-import { TlsOptions } from "tls";
 import { Server } from "net";
-import { RxSocket, IMessage, MessageType } from "../RxSocket";
+import "rxjs/add/operator/filter";
 import "rxjs/add/operator/share";
+import { Observable } from "rxjs/Observable";
+import { TlsOptions } from "tls";
+import { IMessage, MessageType, RxSocket } from "../RxSocket";
+import {
+  IIncomingMessage, IIncomingRequest, IIncomingSubscribe, IIncomingUnsubscribe,
+  IServerMessageSource, RxBaseServer,
+} from "./RxBaseServer";
 
 class OutboundChannels {
   private channels = new Map<string, Set<RxSocket>>();
@@ -35,7 +35,7 @@ class OutboundChannels {
     if (channel) {
       msg.type = msg.type || MessageType.message;
       msg.channel = channelName;
-      channel.forEach(socket => socket.send(msg));
+      channel.forEach((socket) => socket.send(msg));
     }
   }
 }
@@ -59,23 +59,23 @@ export class RxServer implements IServerMessageSource {
     this.baseServer = serverOrOptions && (serverOrOptions as RxBaseServer).messages$ ?
       serverOrOptions as RxBaseServer : new RxBaseServer(serverOrOptions);
     this.messages$ = this.baseServer.messages$
-      .filter(message => !!message.channel)
+      .filter((message) => !!message.channel)
       .share();
     this.requests$ = this.baseServer.requests$
-      .filter(message => !!message.channel)
+      .filter((message) => !!message.channel)
       .share();
     this.subscribes$ = this.baseServer.subscribes$
-      .filter(message => !!message.channel)
+      .filter((message) => !!message.channel)
       .share();
     this.unsubscribes$ = this.baseServer.unsubscribes$
-      .filter(message => !!message.channel)
+      .filter((message) => !!message.channel)
       .share();
 
-    this.subscribes$.subscribe(message => {
+    this.subscribes$.subscribe((message) => {
       this.outboundChannels.subscribe(message.channel, message.socket);
       message.respond();
     });
-    this.unsubscribes$.subscribe(message => {
+    this.unsubscribes$.subscribe((message) => {
       this.outboundChannels.unsubscribe(message.channel, message.socket);
       message.respond();
     });
@@ -91,17 +91,17 @@ export class RxServer implements IServerMessageSource {
     if (!channel) {
       channel = {
         messages$: this.messages$
-          .filter(m => m.channel === name)
+          .filter((m) => m.channel === name)
           .share(),
         requests$: this.requests$
-          .filter(m => m.channel === name)
+          .filter((m) => m.channel === name)
           .share(),
         subscribes$: this.subscribes$
-          .filter(m => m.channel === name)
+          .filter((m) => m.channel === name)
           .share(),
         unsubscribes$: this.unsubscribes$
-          .filter(m => m.channel === name)
-          .share()
+          .filter((m) => m.channel === name)
+          .share(),
       };
       this.channels.set(name, channel);
     }

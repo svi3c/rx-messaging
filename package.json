@@ -8,7 +8,7 @@
   "main": "dist/index.js",
   "scripts": {
     "prepublish": "tsc",
-    "check": "tslint \"src/**/*.ts\"",
+    "check": "tslint \"src/**/*.ts\" -t verbose",
     "test": "npm run check && npm run stest && npm run mtest",
     "stest": "jasmine-ts \"**/*.s-spec.ts\"",
     "mtest": "jasmine-ts \"**/*.m-spec.ts\""

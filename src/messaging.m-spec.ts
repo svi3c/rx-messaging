@@ -1,13 +1,13 @@
 import {
-  beforeEach,
   afterEach,
-  it
+  beforeEach,
+  it,
 } from "jasmine-promise-wrapper";
-import {RxServer, RxClient} from "./index";
-import {Observable} from "rxjs/Observable";
-import {MessageType, IMessage, IRequest, IResponse} from "./messaging/RxSocket";
-import {ConnectionEventType} from "./messaging/client/ClientConnector";
-import {BackoffAlgorithm, linear, constant} from "./messaging/client/BackoffAlgorithms";
+import { Observable } from "rxjs/Observable";
+import { RxClient, RxServer } from "./index";
+import { BackoffAlgorithm, constant, linear } from "./messaging/client/BackoffAlgorithms";
+import { ConnectionEventType } from "./messaging/client/ClientConnector";
+import { IMessage, IRequest, IResponse, MessageType } from "./messaging/RxSocket";
 
 describe("channeledMessaging", () => {
 
@@ -20,14 +20,15 @@ describe("channeledMessaging", () => {
   }
 
   function connect(reconnect?: BackoffAlgorithm, resend?: BackoffAlgorithm) {
-    return new Promise<void>(resolve => {
-      client = new RxClient({port: 11115, host: "localhost"}, reconnect, resend);
-      client.connect().catch(e => {
+    return new Promise<void>((resolve) => {
+      client = new RxClient({ port: 11115, host: "localhost" }, reconnect, resend);
+      client.connect().catch((e) => {
         if (e.code !== "ECONNREFUSED") {
+          // tslint:disable-next-line: no-console
           console.log(e);
         }
       });
-      client.events$.subscribe(event => {
+      client.events$.subscribe((event) => {
         if (event.type === ConnectionEventType.connect) {
           resolve();
         }
@@ -65,7 +66,7 @@ describe("channeledMessaging", () => {
 
       it("should be processed by client and server", async () => {
         let requestPromise = server.channel("foo").requests$.take(1).toPromise();
-        requestPromise.then(req => req.respond("baz"));
+        requestPromise.then((req) => req.respond("baz"));
 
         let x = await Promise.all([requestPromise, client.request("foo", "bar").toPromise()]);
         let request = x[0] as IRequest;
@@ -106,7 +107,7 @@ describe("channeledMessaging", () => {
 
     it("should work when the server is not yet available", () => {
       connect(constant(10), constant(10));
-      return new Promise<void>(resolve => {
+      return new Promise<void>((resolve) => {
         client.send("foo", "bar");
         setTimeout(() =>
           startServer()

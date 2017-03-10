@@ -1,7 +1,7 @@
 import "rxjs/add/operator/finally";
 import proxyquire = require("proxyquire");
-import { ClientConnector } from "./ClientConnector";
 import * as sinon from "sinon";
+import { ClientConnector } from "./ClientConnector";
 
 describe("ClientConnector", () => {
 
@@ -22,8 +22,8 @@ describe("ClientConnector", () => {
     connectTls = jasmine.createSpy("connect").and.returnValue(socket);
     clock = sinon.useFakeTimers();
     ClientConnectorConstructor = (proxyquire("./ClientConnector", {
-      "net": { connect: connectTcp },
-      "tls": { connect: connectTls }
+      net: { connect: connectTcp },
+      tls: { connect: connectTls },
     }) as { ClientConnector: typeof ClientConnector }).ClientConnector;
   });
 

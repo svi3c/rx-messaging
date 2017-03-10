@@ -1,8 +1,8 @@
 import { RxServer } from "./RxServer";
 import proxyquire = require("proxyquire");
 import { Subject } from "rxjs/Subject";
-import { RxBaseServer } from "./RxBaseServer";
 import { MessageType } from "../RxSocket";
+import { RxBaseServer } from "./RxBaseServer";
 
 describe("RxServer", () => {
 
@@ -27,9 +27,9 @@ describe("RxServer", () => {
       let fooMessage;
       let barMessage;
       let bazMessage;
-      server.channel("foo").messages$.subscribe(m => fooMessage = m);
-      server.channel("bar").messages$.subscribe(m => barMessage = m);
-      server.channel("baz").messages$.subscribe(m => bazMessage = m);
+      server.channel("foo").messages$.subscribe((m) => fooMessage = m);
+      server.channel("bar").messages$.subscribe((m) => barMessage = m);
+      server.channel("baz").messages$.subscribe((m) => bazMessage = m);
 
       messages$.next({ channel: "foo", data: "foo" });
       messages$.next({ channel: "bar", data: "bar" });

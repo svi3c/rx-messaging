@@ -1,16 +1,16 @@
 import { Socket } from "net";
-import { Observer } from "rxjs/Observer";
-import { Observable } from "rxjs/Observable";
-import { Subscription } from "rxjs/Subscription";
-import { Subject } from "rxjs/Subject";
 import "rxjs/add/operator/filter";
-import "rxjs/add/operator/share";
 import "rxjs/add/operator/finally";
+import "rxjs/add/operator/share";
+import { Observable } from "rxjs/Observable";
+import { Observer } from "rxjs/Observer";
+import { Subject } from "rxjs/Subject";
+import { Subscription } from "rxjs/Subscription";
 import { TypedError } from "../Error";
-import { RxSocket, IMessage, IRequest, IResponse, ISubscribe, MessageType } from "../RxSocket";
+import { IMessage, IRequest, IResponse, ISubscribe, MessageType, RxSocket } from "../RxSocket";
 import { isDefined } from "../utils";
-import { ClientConnector, ConnectionEventType, IConnectionOptions, IConnectionEvent } from "./ClientConnector";
 import { BackoffAlgorithm } from "./BackoffAlgorithms";
+import { ClientConnector, ConnectionEventType, IConnectionEvent, IConnectionOptions } from "./ClientConnector";
 
 /**
  * A basic client which exposes the received messages as an observable.
@@ -21,29 +21,29 @@ export class RxBaseClient {
 
   messages$: Observable<IMessage>;
   events$: Observable<IConnectionEvent>;
-  private _queue: { message: IMessage, resolve: Function }[] = [];
-  private _messageRetryBackoff: Iterator<number>;
-  private _rxSocket: RxSocket;
-  private _connector: ClientConnector = new ClientConnector(this._connectionOptions, this._reconnectAlgorithm);
-  private _messagesSubscription: Subscription;
-  private _messagesSubject: Subject<IMessage> = new Subject<IMessage>();
+  private queue: Array<{ message: IMessage, resolve: Function }> = [];
+  private messageRetryBackoff: Iterator<number>;
+  private rxSocket: RxSocket;
+  private connector: ClientConnector = new ClientConnector(this.connectionOptions, this.reconnectAlgorithm);
+  private messagesSubscription: Subscription;
+  private messagesSubject: Subject<IMessage> = new Subject<IMessage>();
 
-  constructor(private _connectionOptions: IConnectionOptions,
-    private _reconnectAlgorithm?: BackoffAlgorithm,
-    private _messageRetryAlgorithm?: BackoffAlgorithm) {
-    this.messages$ = this._messagesSubject.asObservable()
-      .filter(message => message.type === MessageType.message);
-    this.events$ = this._connector.events$;
-    this._connector.events$.subscribe((event: IConnectionEvent) => {
+  constructor(private connectionOptions: IConnectionOptions,
+              private reconnectAlgorithm?: BackoffAlgorithm,
+              private messageRetryAlgorithm?: BackoffAlgorithm) {
+    this.messages$ = this.messagesSubject.asObservable()
+      .filter((message) => message.type === MessageType.message);
+    this.events$ = this.connector.events$;
+    this.connector.events$.subscribe((event: IConnectionEvent) => {
       switch (event.type) {
         case ConnectionEventType.connect:
-          this._rxSocket = new RxSocket(event.payload as Socket);
-          this._messagesSubscription = this._rxSocket.messages$.subscribe(this._messagesSubject);
-          this._queue.forEach(item => this._rxSocket.send(item.message).then(() => item.resolve()));
-          this._queue.length = 0;
+          this.rxSocket = new RxSocket(event.payload as Socket);
+          this.messagesSubscription = this.rxSocket.messages$.subscribe(this.messagesSubject);
+          this.queue.forEach((item) => this.rxSocket.send(item.message).then(() => item.resolve()));
+          this.queue.length = 0;
           break;
         case ConnectionEventType.close:
-          this._rxSocket = null;
+          this.rxSocket = null;
           break;
       }
     });
@@ -53,14 +53,14 @@ export class RxBaseClient {
    * Starts connecting to the server.
    */
   connect() {
-    return this._connector.connect();
+    return this.connector.connect();
   }
 
   /**
    * Disconnects from the server.
    */
   disconnect() {
-    return this._connector.disconnect();
+    return this.connector.disconnect();
   }
 
   /**
@@ -73,7 +73,7 @@ export class RxBaseClient {
     request.type = isDefined(request.type) ? request.type : MessageType.request;
     return Observable.create((observer: Observer<IResponse>) => {
       this.send(request);
-      let subscription = this._rxSocket.messages$
+      let subscription = this.rxSocket.messages$
         .filter((response: IResponse) => response.id === request.id)
         .subscribe((response: IResponse) => {
           if (response.error) {
@@ -85,7 +85,7 @@ export class RxBaseClient {
           subscription.unsubscribe();
         });
     });
-  };
+  }
 
   /**
    * Adds a subscription on server events.
@@ -96,7 +96,7 @@ export class RxBaseClient {
     request.type = MessageType.subscribe;
     request.id = request.id || RxBaseClient.nextRequestId++;
     return this.request(request);
-  };
+  }
 
   /**
    * Sends a message to the server.
@@ -104,24 +104,24 @@ export class RxBaseClient {
    * @param message The message to send.
    */
   send = (message: IMessage) => {
-    if (!this._rxSocket) {
-      return new Promise<void>(resolve =>
-        this._queue.push({ message, resolve }));
+    if (!this.rxSocket) {
+      return new Promise<void>((resolve) =>
+        this.queue.push({ message, resolve }));
     } else {
-      this._rxSocket
+      this.rxSocket
         .send(message)
         .then(
-        () => this._messageRetryBackoff = null,
+        () => this.messageRetryBackoff = null,
         (err) => {
-          this._messageRetryBackoff = this._messageRetryBackoff || this._messageRetryAlgorithm && this._messageRetryAlgorithm();
-          const delay = this._messageRetryBackoff ? this._messageRetryBackoff.next() : 0;
+          this.messageRetryBackoff = this.messageRetryBackoff || this.messageRetryAlgorithm && this.messageRetryAlgorithm();
+          const delay = this.messageRetryBackoff ? this.messageRetryBackoff.next() : 0;
           console.warn(`Failed to send message ${JSON.stringify(message)}."`, err);
           console.warn(`Retrying to send message in ${delay}ms`);
-          return new Promise(resolve =>
+          return new Promise((resolve) =>
             setTimeout(() => resolve(this.send(message)), delay));
-        }
+        },
         );
     }
-  };
+  }
 
 }

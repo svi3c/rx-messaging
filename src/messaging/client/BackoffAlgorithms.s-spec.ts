@@ -1,4 +1,4 @@
-import { linear, exponential, random } from "./BackoffAlgorithms";
+import { exponential, linear, random } from "./BackoffAlgorithms";
 
 describe("BackoffAlgorithms", () => {
 

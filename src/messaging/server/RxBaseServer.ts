@@ -1,12 +1,12 @@
-import { createServer as createTlsServer, TlsOptions } from "tls";
 import { createServer as createTcpServer, Server, Socket } from "net";
-import { Observable } from "rxjs/Observable";
-import {
-  RxSocket, MessageType, IResponse, IMessage, IRequest, IUnsubscribe, ISubscribe
-} from "../RxSocket";
 import "rxjs/add/operator/share";
+import { Observable } from "rxjs/Observable";
 import { Subject } from "rxjs/Rx";
+import { createServer as createTlsServer, TlsOptions } from "tls";
 import { IErrorData } from "../Error";
+import {
+  IMessage, IRequest, IResponse, ISubscribe, IUnsubscribe, MessageType, RxSocket,
+} from "../RxSocket";
 
 export type IIncomingSubscribe = IIncomingMessage & ISubscribe;
 export type IIncomingUnsubscribe = IIncomingMessage & IUnsubscribe;
@@ -32,7 +32,7 @@ export class IncomingRequest implements IIncomingRequest {
   respond = (data?: any) => {
     let res = {
       id: this.id,
-      type: MessageType.response
+      type: MessageType.response,
     } as IResponse;
     if (this.channel) {
       res.channel = this.channel;
@@ -41,18 +41,18 @@ export class IncomingRequest implements IIncomingRequest {
       res.data = data;
     }
     return this.socket.send(res);
-  };
+  }
   respondError = (error: IErrorData) => {
     let res = {
       requestId: this.id,
       type: MessageType.response,
-      error: error
+      error,
     } as IMessage;
     if (this.channel) {
       res.channel = this.channel;
     }
     return this.socket.send(res);
-  };
+  }
 }
 
 export interface IServerMessageSource {
@@ -86,19 +86,19 @@ export class RxBaseServer implements IServerMessageSource {
     let subject: Subject<IIncomingMessage> = new Subject<IIncomingMessage>();
     let messages$ = subject.asObservable().share();
     this.messages$ = messages$
-      .filter(m => m.type === MessageType.message)
+      .filter((m) => m.type === MessageType.message)
       .share();
     this.requests$ = (messages$ as Observable<IIncomingRequest>)
-      .filter(m => m.type === MessageType.request)
-      .map(m => new IncomingRequest(m) as IIncomingRequest)
+      .filter((m) => m.type === MessageType.request)
+      .map((m) => new IncomingRequest(m) as IIncomingRequest)
       .share();
     this.subscribes$ = (messages$ as Observable<IIncomingSubscribe>)
-      .filter(m => m.type === MessageType.subscribe)
-      .map(m => new IncomingRequest(m) as IIncomingSubscribe)
+      .filter((m) => m.type === MessageType.subscribe)
+      .map((m) => new IncomingRequest(m) as IIncomingSubscribe)
       .share();
     this.unsubscribes$ = (messages$ as Observable<IIncomingUnsubscribe>)
-      .filter(m => m.type === MessageType.unsubscribe)
-      .map(m => new IncomingRequest(m) as IIncomingUnsubscribe)
+      .filter((m) => m.type === MessageType.unsubscribe)
+      .map((m) => new IncomingRequest(m) as IIncomingUnsubscribe)
       .share();
 
     this.server.on("connection", (socket: Socket) => {
@@ -112,12 +112,12 @@ export class RxBaseServer implements IServerMessageSource {
    * @param port The port to listen to
    */
   listen = (port: number) => new Promise<void>((resolve, reject) =>
-    this.server.listen(port, err => err ? reject(err) : resolve())
+    this.server.listen(port, (err) => err ? reject(err) : resolve()),
   );
 
-  close = () => new Promise<void>(resolve => {
+  close = () => new Promise<void>((resolve) => {
     this.server.removeAllListeners();
     this.server.close(resolve);
-  });
+  })
 
 }

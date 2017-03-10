@@ -7,7 +7,7 @@ export interface IBackoffOptions {
 
 const defaultBackoffOptions: IBackoffOptions = {
   from: 0,
-  to: 5000
+  to: 5000,
 };
 
 // Constant backoff
@@ -20,8 +20,8 @@ function* constantGenerator(constant: number) {
 /**
  * Generates a constant value.
  */
-export const constant: (constant: number) => BackoffAlgorithm = constant =>
-  () => constantGenerator(constant);
+export const constant: (constant: number) => BackoffAlgorithm = (value) =>
+  () => constantGenerator(value);
 
 // Linear backoff
 
@@ -30,7 +30,7 @@ export interface ILinearBackoffOptions extends IBackoffOptions {
 }
 
 const defaultLinearReconnectOptions: ILinearBackoffOptions = {
-  factor: 500
+  factor: 500,
 };
 
 function* linearGenerator(opts?: ILinearBackoffOptions) {
@@ -48,7 +48,7 @@ function* linearGenerator(opts?: ILinearBackoffOptions) {
 /**
  * Generates values with a linear growth
  */
-export const linear: (opts?: ILinearBackoffOptions) => BackoffAlgorithm = opts =>
+export const linear: (opts?: ILinearBackoffOptions) => BackoffAlgorithm = (opts) =>
   () => linearGenerator(opts);
 
 // Exponential backoff
@@ -59,9 +59,9 @@ export interface IExponentialBackoffOptions extends IBackoffOptions {
 }
 
 const defaultExponentialBackoffOptions: IExponentialBackoffOptions = {
-  from: 1,
   base: 2,
-  factor: 1
+  factor: 1,
+  from: 1,
 };
 
 function* exponentialGenerator(opts?: IExponentialBackoffOptions) {
@@ -81,7 +81,7 @@ function* exponentialGenerator(opts?: IExponentialBackoffOptions) {
 /**
  * Generates values with an exponential growth
  */
-export const exponential: (opts?: IExponentialBackoffOptions) => BackoffAlgorithm = opts =>
+export const exponential: (opts?: IExponentialBackoffOptions) => BackoffAlgorithm = (opts) =>
   () => exponentialGenerator(opts);
 
 // Random backoff
@@ -101,5 +101,5 @@ function* randomGenerator(opts?: IRandomBackoffOptions) {
 /**
  * Generates random values
  */
-export const random: (opts?: IExponentialBackoffOptions) => BackoffAlgorithm = opts =>
+export const random: (opts?: IExponentialBackoffOptions) => BackoffAlgorithm = (opts) =>
   () => randomGenerator(opts);

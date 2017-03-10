@@ -1,11 +1,11 @@
-import { connect as connectTls, ConnectionOptions } from "tls";
 import { connect as connectTcp, Socket } from "net";
 import { Observable } from "rxjs/Observable";
 import { Observer } from "rxjs/Observer";
 import { Subject } from "rxjs/Subject";
 import { Subscription } from "rxjs/Subscription";
-import { BackoffAlgorithm } from "./BackoffAlgorithms";
+import { connect as connectTls, ConnectionOptions } from "tls";
 import { RxSocket } from "../RxSocket";
+import { BackoffAlgorithm } from "./BackoffAlgorithms";
 
 export interface IConnectionOptions extends ConnectionOptions {
   port: number;
@@ -14,7 +14,7 @@ export interface IConnectionOptions extends ConnectionOptions {
 export enum ConnectionEventType {
   connect,
   error,
-  close
+  close,
 }
 
 export interface IConnectionEvent {
@@ -29,10 +29,10 @@ export class ClientConnector {
 
   socket: Socket;
   events$: Observable<IConnectionEvent>;
-  private _eventsObserver: Observer<IConnectionEvent>;
-  private _connectionBackoff: Iterator<number>;
-  private _connectingSubscription: Subscription;
-  private _timeout: NodeJS.Timer;
+  private eventsObserver: Observer<IConnectionEvent>;
+  private connectionBackoff: Iterator<number>;
+  private connectingSubscription: Subscription;
+  private timeout: NodeJS.Timer;
 
   /**
    * Creates a connector.
@@ -40,9 +40,9 @@ export class ClientConnector {
    * @param reconnectAlgorithm
    */
   constructor(public connectionOptions: IConnectionOptions,
-    public reconnectAlgorithm?: BackoffAlgorithm) {
+              public reconnectAlgorithm?: BackoffAlgorithm) {
     let subject = new Subject<IConnectionEvent>();
-    this._eventsObserver = subject;
+    this.eventsObserver = subject;
     this.events$ = subject.asObservable();
   }
 
@@ -53,14 +53,14 @@ export class ClientConnector {
    */
   connect(delay = 0) {
     return new Promise<RxSocket>((resolve, reject) => {
-      this._timeout = setTimeout(() => {
+      this.timeout = setTimeout(() => {
         let connect: any = this.connectionOptions.cert ? connectTls : connectTcp;
-        this._timeout = null;
+        this.timeout = null;
         this.socket = connect(this.connectionOptions);
-        this._attachListenersToSocket();
-        this._connectingSubscription = this.events$.subscribe(event => {
-          this._connectingSubscription.unsubscribe();
-          this._connectingSubscription = null;
+        this.attachListenersToSocket();
+        this.connectingSubscription = this.events$.subscribe((event) => {
+          this.connectingSubscription.unsubscribe();
+          this.connectingSubscription = null;
           switch (event.type) {
             case ConnectionEventType.error:
               reject(event.payload);
@@ -79,14 +79,14 @@ export class ClientConnector {
    * @returns {Promise<void>}
    */
   disconnect() {
-    return new Promise<void>(resolve => {
-      if (this._timeout) {
-        clearTimeout(this._timeout);
-        this._timeout = null;
+    return new Promise<void>((resolve) => {
+      if (this.timeout) {
+        clearTimeout(this.timeout);
+        this.timeout = null;
       }
-      if (this._connectingSubscription) {
-        this._connectingSubscription.unsubscribe();
-        this._connectingSubscription = null;
+      if (this.connectingSubscription) {
+        this.connectingSubscription.unsubscribe();
+        this.connectingSubscription = null;
       }
       this.socket.removeAllListeners();
       this.socket.once("close", () => resolve());
@@ -95,21 +95,21 @@ export class ClientConnector {
     });
   }
 
-  private _attachListenersToSocket() {
+  private attachListenersToSocket() {
     this.socket.on("connect", () => {
-      this._eventsObserver.next({ type: ConnectionEventType.connect, payload: this.socket });
-      this._connectionBackoff = null;
+      this.eventsObserver.next({ type: ConnectionEventType.connect, payload: this.socket });
+      this.connectionBackoff = null;
     });
-    this.socket.on("error", err => {
+    this.socket.on("error", (err) => {
       this.socket.destroy();
-      this._eventsObserver.next({ type: ConnectionEventType.error, payload: err });
+      this.eventsObserver.next({ type: ConnectionEventType.error, payload: err });
     });
     this.socket.on("close", () => {
       this.socket.removeAllListeners();
       this.socket = null;
-      this._eventsObserver.next({ type: ConnectionEventType.close });
-      this._connectionBackoff = this._connectionBackoff || this.reconnectAlgorithm && this.reconnectAlgorithm();
-      this.connect(this._connectionBackoff ? this._connectionBackoff.next().value : 0)
+      this.eventsObserver.next({ type: ConnectionEventType.close });
+      this.connectionBackoff = this.connectionBackoff || this.reconnectAlgorithm && this.reconnectAlgorithm();
+      this.connect(this.connectionBackoff ? this.connectionBackoff.next().value : 0)
         .catch(() => { });
     });
   }

@@ -1,10 +1,10 @@
 import "rxjs/add/operator/share";
-import { RxBaseClient } from "./RxBaseClient";
 import { Observable } from "rxjs/Observable";
-import { MessageType, IMessage, IRequest, ISubscribe } from "../RxSocket";
-import { IConnectionOptions, IConnectionEvent } from "./ClientConnector";
-import { BackoffAlgorithm } from "./BackoffAlgorithms";
+import { IMessage, IRequest, ISubscribe, MessageType } from "../RxSocket";
 import { RxSocket } from "../RxSocket";
+import { BackoffAlgorithm } from "./BackoffAlgorithms";
+import { IConnectionEvent, IConnectionOptions } from "./ClientConnector";
+import { RxBaseClient } from "./RxBaseClient";
 
 /**
  * A client for the {@link RxServer}.
@@ -16,8 +16,8 @@ export class RxClient {
   private channels: Map<String, Observable<IMessage>> = new Map<String, Observable<IMessage>>();
 
   constructor(connectionOptions: RxBaseClient | IConnectionOptions,
-    reconnectAlgorithm?: BackoffAlgorithm,
-    messageRetryAlgorithm?: BackoffAlgorithm) {
+              reconnectAlgorithm?: BackoffAlgorithm,
+              messageRetryAlgorithm?: BackoffAlgorithm) {
     this.baseClient = (connectionOptions instanceof RxBaseClient) ? connectionOptions :
       new RxBaseClient(connectionOptions as IConnectionOptions, reconnectAlgorithm, messageRetryAlgorithm);
     this.events$ = this.baseClient.events$;
@@ -26,13 +26,13 @@ export class RxClient {
   send = (channel: string, data?: any) => this.baseClient.send({
     channel,
     data,
-    type: MessageType.message
-  } as IMessage);
+    type: MessageType.message,
+  } as IMessage)
 
   request = (channel: string, data?: any) => this.baseClient.request({
     channel,
-    data
-  } as IRequest);
+    data,
+  } as IRequest)
 
   subscribe = (channel: string) => {
     let channel$ = this.channels.get(channel);
@@ -40,7 +40,7 @@ export class RxClient {
       return Promise.resolve(channel$);
     } else {
       channel$ = (this.baseClient.messages$ as Observable<IMessage>)
-        .filter(message => message.channel === channel);
+        .filter((message) => message.channel === channel);
       return this.baseClient
         .subscribe({ channel } as ISubscribe).toPromise()
         .then(() => {
@@ -48,7 +48,7 @@ export class RxClient {
           return channel$;
         });
     }
-  };
+  }
 
   connect(): Promise<RxSocket> {
     return this.baseClient.connect();

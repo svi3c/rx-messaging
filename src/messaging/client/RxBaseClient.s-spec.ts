@@ -25,10 +25,10 @@ describe("RxBaseClient", () => {
     connectTcp = jasmine.createSpy("connect").and.returnValue(socket);
     connectTls = jasmine.createSpy("connect").and.returnValue(socket);
     RxBaseClientConstructor = (proxyquire("./RxBaseClient", {
-      "./RxSocket": RxSocket,
       "./ClientConnector": { ClientConnector },
+      "./RxSocket": RxSocket,
       "net": { connect: connectTcp },
-      "tls": { connect: connectTls }
+      "tls": { connect: connectTls },
     }) as { RxBaseClient: typeof RxBaseClient }).RxBaseClient;
   });
 

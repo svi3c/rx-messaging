@@ -1,8 +1,8 @@
-import "rxjs/add/operator/finally";
-import { RxBaseServer } from "./RxBaseServer";
 import * as proxyquire from "proxyquire";
-import { IMessage, MessageType } from "../RxSocket";
+import "rxjs/add/operator/finally";
 import { Subject } from "rxjs/Rx";
+import { IMessage, MessageType } from "../RxSocket";
+import { RxBaseServer } from "./RxBaseServer";
 
 describe("RxBaseServer", () => {
 
@@ -17,15 +17,16 @@ describe("RxBaseServer", () => {
     JsonSocket = jasmine.createSpy("JsonSocket");
     messages$ = new Subject<IMessage>();
     let rxSocket = {
-      messages$
+      messages$,
     } as any;
     let module = proxyquire("./RxBaseServer", {
-      "json-socket": JsonSocket,
       "../RxSocket": {
+        // tslint:disable-next-line: only-arrow-functions object-literal-shorthand
         RxSocket: function () {
           return rxSocket;
-        }
-      }
+        },
+      },
+      "json-socket": JsonSocket,
     }) as { RxBaseServer: typeof RxBaseServer };
     rxBaseServer = new module.RxBaseServer(server);
     connect();
@@ -33,7 +34,7 @@ describe("RxBaseServer", () => {
   });
 
   it("should emit the message if the server retrieves it", () => {
-    rxBaseServer.messages$.subscribe(m => message = m);
+    rxBaseServer.messages$.subscribe((m) => message = m);
 
     sendMessage({ data: "foo", type: MessageType.message });
 
@@ -42,7 +43,7 @@ describe("RxBaseServer", () => {
   });
 
   it("should emit the request if the server retrieves it", () => {
-    rxBaseServer.requests$.subscribe(m => message = m);
+    rxBaseServer.requests$.subscribe((m) => message = m);
 
     sendMessage({ data: "foo", type: MessageType.request });
 
@@ -51,7 +52,7 @@ describe("RxBaseServer", () => {
   });
 
   it("should emit the subscription if the server retrieves it", () => {
-    rxBaseServer.subscribes$.subscribe(m => message = m);
+    rxBaseServer.subscribes$.subscribe((m) => message = m);
 
     sendMessage({ type: MessageType.subscribe });
 
@@ -59,7 +60,7 @@ describe("RxBaseServer", () => {
   });
 
   it("should emit the unsubscription if the server retrieves it", () => {
-    rxBaseServer.unsubscribes$.subscribe(m => message = m);
+    rxBaseServer.unsubscribes$.subscribe((m) => message = m);
 
     sendMessage({ type: MessageType.unsubscribe });
 
@@ -70,8 +71,8 @@ describe("RxBaseServer", () => {
     server.on.calls.mostRecent().args[1]();
   }
 
-  function sendMessage(message: IMessage) {
-    messages$.next(message);
+  function sendMessage(msg: IMessage) {
+    messages$.next(msg);
   }
 
 });
